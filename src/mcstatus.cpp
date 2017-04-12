@@ -27,13 +27,13 @@ status::~status()
 
 int status::unpack_varint()
 {
-    uint8_t d = 0;
+    int d = 0;
     for (int i = 0; i < 5; i++)
     {
         uint8_t b[1] = {0x00};
         sock.read_some(boost::asio::buffer(b, 1));
-        d |= (b && 0x7F) << 7*i;
-        if (!b && 0x80)
+        d |= (b[0] & 0x7F) << 7*i;
+        if (!(b[0] & 0x80))
             break;
     }
 
@@ -96,17 +96,17 @@ void status::reMotd()
                 p.getPacket()
                 ));
     
+    unpack_varint();
+    unpack_varint();
     int l = unpack_varint();
 
     std::string json;
     while (json.size() < l)
     {
-        unsigned char buff[1024] = {0x00}; 
-        sock.read_some(boost::asio::buffer(buff, 1024));
+        unsigned char buff[1] = {0x00}; 
+        sock.read_some(boost::asio::buffer(buff, 1));
         json += (char*)buff;
     }
-
-    std::cout << json << std::endl;
 
     json2status(json);
     
