@@ -12,7 +12,7 @@ set (SOURCE_FILES
 set(CMAKE_CXX_STANDARD 11)
 
 # Boost
-find_package(Boost 1.55 COMPONENTS system thread REQUIRED)
+find_package(Boost 1.55 COMPONENTS system REQUIRED)
 if(${Boost_FOUND})
     include_directories(${Boost_INCLUDE_DIRS})
     link_directories(${Boost_LIBRARY_DIR})
