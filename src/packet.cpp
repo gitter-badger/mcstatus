@@ -1,4 +1,4 @@
-#include "packet.hpp"
+#include "mcstatus/packet.hpp"
 
 #include <string>
 #include <vector>

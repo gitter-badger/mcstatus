@@ -1,5 +1,5 @@
-#include "mcstatus.hpp"
-#include "packet.hpp"
+#include "mcstatus/mcstatus.hpp"
+#include "mcstatus/packet.hpp"
 
 #include <string>
 #include <iostream>
@@ -58,14 +58,20 @@ void status::json2status(const std::string& json)
 
     try
     {
+        if (pt.get<std::string>("description").empty())
+        {
+            for (auto& description : pt.get_child("description"))
+                m_motd.description = description.second.get_value<std::string>();
+        } else
+            m_motd.description = pt.get<std::string>("description");
+        
+
         std::vector<std::string> players_array;
         for (auto& players : pt.get_child("players")) // get online and max of players
             players_array.push_back(players.second.get_value<std::string>());
 
         m_motd.player_max = atoi(players_array[0].c_str());
         m_motd.player_online = atoi(players_array[1].c_str());
-        m_motd.description = pt.get<std::string>("description");
-
     }
     catch (ptree_error &e)
     {
@@ -99,6 +105,8 @@ void status::reMotd()
         sock.read_some(boost::asio::buffer(buff, 1024));
         json += (char*)buff;
     }
+
+    std::cout << json << std::endl;
 
     json2status(json);
     

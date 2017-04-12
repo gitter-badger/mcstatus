@@ -4,7 +4,7 @@
 #include <cstring>
 #include <cstdio>
 
-#include "mcstatus.hpp"
+#include <mcstatus/mcstatus.hpp>
 
 void usage()
 {
@@ -44,6 +44,8 @@ int main(int argc, char** argv)
             usage();
         }
     }
+
+    if (!opt_idx) return 1;
 
     mc::status motd(hostname, port);
     mc::motd_t m = motd.getMotd();
