@@ -56,30 +56,22 @@ void status::json2status(const std::string& json)
         exit(1);
     }
 
-    try
+    // get description(main motd)
+    m_motd.description = pt.get<std::string>("description");
+    if (m_motd.description.empty())
     {
-        // get description(main motd)
-        if (pt.get<std::string>("description").empty())
-        {
-            for (auto& description : pt.get_child("description"))
-                m_motd.description = description.second.get_value<std::string>();
-        } else
-            m_motd.description = pt.get<std::string>("description");
-        
-
-        // get online and player max
-        std::vector<std::string> players_array;
-        for (auto& players : pt.get_child("players"))
-            players_array.push_back(players.second.get_value<std::string>());
-
-        m_motd.player_max = atoi(players_array[0].c_str());
-        m_motd.player_online = atoi(players_array[1].c_str());
+        for (auto& description : pt.get_child("description"))
+            m_motd.description = description.second.get_value<std::string>();
     }
-    catch (ptree_error &e)
-    {
-        std::clog << e.what() << std::endl;
-        exit(1);
-    }
+
+
+    // get online and player max
+    std::vector<std::string> players_array;
+    for (auto& players : pt.get_child("players"))
+        players_array.push_back(players.second.get_value<std::string>());
+
+    m_motd.player_max = atoi(players_array[0].c_str());
+    m_motd.player_online = atoi(players_array[1].c_str());
 }
 
 motd_t status::getMotd()
@@ -89,8 +81,15 @@ motd_t status::getMotd()
 
 void status::reMotd()
 {
-    sock.open(boost::asio::ip::tcp::v4());
-    sock.connect(ep);
+    try
+    {
+        sock.open(boost::asio::ip::tcp::v4());
+        sock.connect(ep);
+    }
+    catch (...)
+    {
+        std::cout << "Can not connect to server :(" << std::endl;
+    }
 
     mc::packet p = mc::packet::from_string("10 00 BC 02 09 31 32 37 2E 30 2E 30 2E 31 09 1D 01 01 00");
 
@@ -105,9 +104,10 @@ void status::reMotd()
     std::string json;
     while (json.size() < l)
     {
-        unsigned char buff[1024] = {0x00}; 
-        sock.read_some(boost::asio::buffer(buff, 1024));
-        json += (char*)buff;
+        // Do not use buff[1024]
+        unsigned char buff[1] = {0x00}; 
+        sock.read_some(boost::asio::buffer(buff, 1));
+        json += reinterpret_cast<char*>(&buff[0]);
     }
 
     json2status(json);

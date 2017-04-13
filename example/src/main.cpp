@@ -23,17 +23,20 @@ int main(int argc, char** argv)
     short port;
 
     int opt_idx = 1;
-    for (; opt_idx < argc && *argv[opt_idx] =='-'; opt_idx++)
+    for (; opt_idx < argc; opt_idx++)
     {
-        if (strcmp(argv[opt_idx], "--host") == 0 ||
-            strcmp(argv[opt_idx], "-h") == 0)
+        if (!*argv[opt_idx] =='-')
+            break;
+
+        if (!strcmp(argv[opt_idx], "--host") ||
+            !strcmp(argv[opt_idx], "-h"))
         {
             ++opt_idx;
             hostname = argv[opt_idx];
         }
         else if (
-            strcmp(argv[opt_idx], "--port") == 0 ||
-            strcmp(argv[opt_idx], "-p") == 0)
+            !strcmp(argv[opt_idx], "--port")||
+            !strcmp(argv[opt_idx], "-p"))
         {
             ++opt_idx;
             port = static_cast<short> (std::atoi(argv[opt_idx]));
@@ -45,7 +48,7 @@ int main(int argc, char** argv)
         }
     }
 
-    if (!opt_idx) return 1;
+    if (argc - opt_idx != 0) return 1;
 
     mc::status motd(hostname, port);
     mc::motd_t m = motd.getMotd();
