@@ -58,6 +58,7 @@ void status::json2status(const std::string& json)
 
     try
     {
+        // get description(main motd)
         if (pt.get<std::string>("description").empty())
         {
             for (auto& description : pt.get_child("description"))
@@ -66,8 +67,9 @@ void status::json2status(const std::string& json)
             m_motd.description = pt.get<std::string>("description");
         
 
+        // get online and player max
         std::vector<std::string> players_array;
-        for (auto& players : pt.get_child("players")) // get online and max of players
+        for (auto& players : pt.get_child("players"))
             players_array.push_back(players.second.get_value<std::string>());
 
         m_motd.player_max = atoi(players_array[0].c_str());
@@ -103,8 +105,8 @@ void status::reMotd()
     std::string json;
     while (json.size() < l)
     {
-        unsigned char buff[1] = {0x00}; 
-        sock.read_some(boost::asio::buffer(buff, 1));
+        unsigned char buff[1024] = {0x00}; 
+        sock.read_some(boost::asio::buffer(buff, 1024));
         json += (char*)buff;
     }
 

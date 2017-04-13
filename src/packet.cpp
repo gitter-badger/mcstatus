@@ -22,6 +22,11 @@ unsigned char convert(const std::string& s)
 namespace mc
 {
 
+packet::packet(const std::string& packet)
+{
+    from_string(packet);
+}
+
 packet::packet()
 {
 }
@@ -43,20 +48,22 @@ packet_t packet::getPacket() const
 
 packet packet::from_string(const std::string& packets)
 {
-    //assert(!(packets.size() >= 1));
+    assert((packets.size() >= 2));
 
     packet_t buffer;
-    
-    std::vector<std::string> packets_split;
-    boost::split(packets_split, packets, boost::is_any_of(" "));
 
-    //packets_split.insert(packets_split.begin(), packets.substr(0, 2) );
-
-    for (auto&& x : packets_split)
+    if (packets.size() != 2)
     {
-        buffer.push_back(convert(x));
+        std::vector<std::string> packets_split;
+        boost::split(packets_split, packets, boost::is_any_of(" "));
+
+        for (auto&& x : packets_split)
+            buffer.push_back(convert(x));
+    } else
+    {
+        buffer.push_back(convert(packets));
     }
-    
+
     packet packet_new;
     packet_new.setPacket(buffer);
 

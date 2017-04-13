@@ -50,8 +50,7 @@ int main(int argc, char** argv)
     mc::status motd(hostname, port);
     mc::motd_t m = motd.getMotd();
     std::cout << "description: " << m.description << std::endl;
-    std::cout << "max player: " << m.player_max << std::endl;
-    std::cout << "online player: " << m.player_online << std::endl;
+    std::cout << "players: " << m.player_online << "/" << m.player_max << std::endl;
     
     return 0;
 }

@@ -12,6 +12,7 @@ typedef std::vector<unsigned char> packet_t;
 class packet
 {
 public:
+    packet(const std::string& packets);
     packet();
     ~packet();
 
